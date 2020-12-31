@@ -4,41 +4,63 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
-public class Q5Client1 {
+public class Q5Client1 extends Thread{
     
-    static String ifServerStopped(String arg) throws Exception
-    {
-        if(arg.equals("closed"))
-        {
-            System.out.println("Server is Closed");
-            throw new Exception();
-        }
-        return arg;
-    }
     public static void main(String[] args) {
-        try{
-        Socket socket=new Socket("localhost",9900);
-
-        BufferedReader socketInput= new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        PrintWriter socketOutput=new PrintWriter(socket.getOutputStream(),true);
+        Socket socket;
+        BufferedReader socketInput;
+        PrintWriter socketOutput;
         Scanner sc=new Scanner(System.in);
-        String ip;
-        while(socket.isConnected())
-        {
-           System.out.println("enter a string to check if palindrome");
-           ip=sc.nextLine();
-           if(ip.equals("exit"))
-           {
-               socket.close();
-               break;
-           }
-           socketOutput.println(ip);
-           System.out.println(ifServerStopped(socketInput.readLine()));
-        }
+        try{
+            socket=new Socket("localhost",9900);
+            socketInput= new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            socketOutput=new PrintWriter(socket.getOutputStream(),true);
+            new Thread(){
+                public void run()
+                {
+                    try{
+                        String ip;
+                        while(!socket.isClosed())
+                        {
+                            ip=socketInput.readLine();
+                            if(!ip.equals(""))
+                            System.out.println(ip);
+                            if(ip.equals("close"))
+                            {
+                                System.out.println("server is close..hit enter to close connection");
+                                socket.close();
+                                break;
+                            }
+                        }
+                    }
+                    catch(Exception e)
+                    {System.out.println(e);}
+                }
+            }.start();
+            new Thread(){
+                public void run()
+                {
+                    try{
+                        String op;
+                        while(!socket.isClosed())
+                        {
+                            op=sc.nextLine();
+                            socketOutput.println(op);
+                            if(op.equals("exit"))
+                            {
+                                socket.close();
+                                break;
+                            }
+                        }
+                    }
+                    catch(Exception e)
+                    {System.out.println(e);}
+                }
+            }.start();
         }
         catch(Exception e)
         {
-            System.out.println(e);
+        e.printStackTrace(System.out);
         }
     }
 }

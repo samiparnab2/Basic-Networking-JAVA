@@ -4,96 +4,69 @@ import java.net.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-class Q5ServerRun extends Thread{
-     Socket socket;
-     BufferedReader socketInput;
-     PrintWriter socketOutput;
-    Q5ServerRun(Socket s) throws Exception
-    {
-        socket=s;
-        socketInput= new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        socketOutput=new PrintWriter(socket.getOutputStream(),true);
-    }
-   void closeSocket() throws Exception
-   {
-       socketOutput.println("closed");
-       socket.close();
-   }
-    public void run()
-    {
-        try{
-            String ip;
-            while(true)
-            {
-                ip=socketInput.readLine();
-                if(ip.equals("exit"))
-                {
-                    socket.close();
-                    break;
-                }
-                socketOutput.println(isPalindrom(ip));
-            }
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace(System.out);
-        }
-    }
-    String isPalindrom(String s)
-    {
-        int n=s.length();
-        for(int i=0,j=n-1;i<=j;i++,j--)
-        {
-            if(s.charAt(i)!=s.charAt(j))
-            return "Not Palindrome";
-        }
-        return "Palindrome";
-    }
-}
-class ServerControl implements Runnable
-{
-    int port=9900;
-    Scanner sc=new Scanner(System.in);
-    ServerSocket ss;
-    ArrayList<Q5ServerRun> connections=new ArrayList<Q5ServerRun>();
-    void serverStart() throws Exception
-    {
-            new Thread(this).start();
-            ss=new ServerSocket(port);
-            while(true)
-            {
-                connections.add(new Q5ServerRun(ss.accept()));
-                connections.get(connections.size()-1).start();   
-            }
-    }
-    
-    public void run()
-    {
-        try{
-            while(!sc.nextLine().equals("q")){}
-            for(Q5ServerRun i : connections)
-            {
-                i.closeSocket();
-            }
-            ss.close();
-            System.exit(1);
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace(System.out);
-        }
-    }
-}
-class Q5Server {
 
-    public static void main(String[] args)  {
+class Q5Server extends Thread{
+    public static void main(String[] args)  
+    {
+        int port=9900;
+        Socket socket;
+        ServerSocket ss;  
+        BufferedReader socketInput;
+        PrintWriter socketOutput;
+        Scanner sc=new Scanner(System.in);
         try{
-        new ServerControl().serverStart();
+            ss=new ServerSocket(port);
+            socket=ss.accept();
+            socketInput= new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            socketOutput=new PrintWriter(socket.getOutputStream(),true);
+
+            new Thread(){
+                public void run()
+                {
+                    try{
+                        String ip;
+                        while(!socket.isClosed())
+                        {
+                            ip=socketInput.readLine();
+                            if(!ip.equals(""))
+                            System.out.println(ip);
+                            if(ip.equals("exit"))
+                            {
+                                System.out.println("client left...hit enter to close server");
+
+                                socket.close();
+                                break;
+                            }
+                        }
+                    }
+                    catch(Exception e)
+                    {System.out.println(e);}
+                }
+            }.start();
+            new Thread(){
+                public void run()
+                {
+                    try{
+                        String op;
+                        while(!socket.isClosed())
+                        {
+                            op=sc.nextLine();
+                            socketOutput.println(op);
+                            if(op.equals("close"))
+                            {
+                                socket.close();
+                                break;
+                            }
+                        }
+                    }
+                    catch(Exception e)
+                    {System.out.println(e);}
+                }
+            }.start();
         }
         catch(Exception e)
         {
-           e.printStackTrace(System.out);
-        }
+        e.printStackTrace(System.out);
+        }   
     }
 }
