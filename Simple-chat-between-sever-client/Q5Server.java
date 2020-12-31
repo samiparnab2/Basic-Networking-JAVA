@@ -29,7 +29,7 @@ class Q5Server extends Thread{
                         {
                             ip=socketInput.readLine();
                             if(!ip.equals(""))
-                            System.out.println(ip);
+                            System.out.println("client:-"+ip);
                             if(ip.equals("exit"))
                             {
                                 System.out.println("client left...hit enter to close server");

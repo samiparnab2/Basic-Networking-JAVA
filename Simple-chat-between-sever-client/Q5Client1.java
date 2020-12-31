@@ -24,7 +24,7 @@ public class Q5Client1 extends Thread{
                         {
                             ip=socketInput.readLine();
                             if(!ip.equals(""))
-                            System.out.println(ip);
+                            System.out.println("server:-"+ip);
                             if(ip.equals("close"))
                             {
                                 System.out.println("server is close..hit enter to close connection");
