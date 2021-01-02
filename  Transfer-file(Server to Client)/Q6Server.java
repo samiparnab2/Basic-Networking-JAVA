@@ -1,15 +1,12 @@
-
 import java.util.Scanner;
 import java.net.*;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 class Q6ServerRun extends Thread{
      Socket socket;
      BufferedReader socketInput;
      PrintWriter socketOutput;
-    Q4ServerRun(Socket s) throws Exception
+    Q6ServerRun(Socket s) throws Exception
     {
         socket=s;
         socketInput= new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -17,7 +14,6 @@ class Q6ServerRun extends Thread{
     }
    void closeSocket() throws Exception
    {
-       socketOutput.println("closed");
        socket.close();
    }
     public void run()
@@ -32,7 +28,7 @@ class Q6ServerRun extends Thread{
                     socket.close();
                     break;
                 }
-                runCommand(ip);
+               runCommand(ip);
             }
         }
         catch(Exception e)
@@ -41,29 +37,35 @@ class Q6ServerRun extends Thread{
         }
     }
 
-    void runCommand(String cm)
+    void runCommand(String cm) throws Exception
     {
          String command[]=cm.split(" ",0);
          if(command[0].equals("download"))
          {
-             File f=
+             File f=new File(command[1]);
+             InputStream is=new FileInputStream(f);
+             socketOutput.println(f.length());
+             while(socketInput.readLine().equals("1"))
+             {
+                socketOutput.println(is.read());
+             }
+             System.out.println("successfully sent file of size "+f.length()+"bytes");
          }
     }
-    
 }
 class ServerControl implements Runnable
 {
     int port=9900;
     Scanner sc=new Scanner(System.in);
     ServerSocket ss;
-    ArrayList<Q4ServerRun> connections=new ArrayList<Q4ServerRun>();
+    ArrayList<Q6ServerRun> connections=new ArrayList<Q6ServerRun>();
     void serverStart() throws Exception
     {
             new Thread(this).start();
             ss=new ServerSocket(port);
             while(true)
             {
-                connections.add(new Q4ServerRun(ss.accept()));
+                connections.add(new Q6ServerRun(ss.accept()));
                 connections.get(connections.size()-1).start();   
             }
     }
@@ -72,7 +74,7 @@ class ServerControl implements Runnable
     {
         try{
             while(!sc.nextLine().equals("q")){}
-            for(Q4ServerRun i : connections)
+            for(Q6ServerRun i : connections)
             {
                 i.closeSocket();
             }
@@ -86,7 +88,6 @@ class ServerControl implements Runnable
     }
 }
 class Q6Server {
-
     public static void main(String[] args)  {
         try{
         new ServerControl().serverStart();
