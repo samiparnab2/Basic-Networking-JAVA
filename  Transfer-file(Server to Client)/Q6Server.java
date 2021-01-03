@@ -23,6 +23,7 @@ class Q6ServerRun extends Thread{
             while(true)
             {
                 ip=socketInput.readLine();
+                System.out.println(ip);
                 if(ip.equals("exit"))
                 {
                     socket.close();
@@ -66,6 +67,7 @@ class ServerControl implements Runnable
             while(true)
             {
                 connections.add(new Q6ServerRun(ss.accept()));
+                System.out.println("client added");
                 connections.get(connections.size()-1).start();   
             }
     }

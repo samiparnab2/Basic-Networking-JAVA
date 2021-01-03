@@ -41,6 +41,10 @@ class Q7ServerRun extends Thread{
                 {
                     socketOutput.println(LocalDateTime.now().toString().replaceFirst("T"," "));
                 }
+                else
+                {
+                    socketOutput.println("");
+                }
             }
         }
         catch(Exception e)
@@ -59,10 +63,11 @@ class ServerControl implements Runnable
     void serverStart() throws Exception
     {
             new Thread(this).start();
-            ss=new ServerSocket(port);
+            ss=new ServerSocket(9900);
             while(true)
             {
                 connections.add(new Q7ServerRun(ss.accept()));
+                System.out.println(connections.get(connections.size()-1).socket.getInetAddress()+"connected");
                 connections.get(connections.size()-1).start();   
             }
     }

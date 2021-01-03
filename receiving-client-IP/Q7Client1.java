@@ -17,7 +17,7 @@ public class Q7Client1 {
     }
     public static void main(String[] args) {
         try{
-        Socket socket=new Socket("localhost",9900);
+        Socket socket=new Socket("192.168.0.103",9900);
 
         BufferedReader socketInput= new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter socketOutput=new PrintWriter(socket.getOutputStream(),true);
