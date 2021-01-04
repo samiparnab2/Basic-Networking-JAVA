@@ -52,7 +52,7 @@ public class Q6Client2 {
                    }
                    socketOutput.println(0);
                    os.close();
-                   System.out.println("successfully received file of size "+size+" bytes");
+                   System.out.println("successfully received file ");
 
                }
            }
