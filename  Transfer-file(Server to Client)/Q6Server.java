@@ -45,11 +45,19 @@ class Q6ServerRun extends Thread{
          {
              File f=new File(command[1]);
              InputStream is=new FileInputStream(f);
+             int read=-1;
+             byte[] data=new byte[1024];
              socketOutput.println(f.length());
-             while(socketInput.readLine().equals("1"))
+             socketInput.readLine();
+             DataOutputStream dataWrite= new DataOutputStream(socket.getOutputStream());
+             while(true)
              {
-                socketOutput.println(is.read());
+                 read=is.read(data,0,data.length);
+                 if(read<=-1)
+                     break;
+                dataWrite.write(data,0,read);
              }
+             is.close();
              System.out.println("successfully sent file of size "+f.length()+"bytes");
          }
     }

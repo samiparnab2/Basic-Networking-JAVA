@@ -37,11 +37,18 @@ public class Q6Client1 {
                {
                    OutputStream os=new FileOutputStream(new File("(down)"+com[1]));
                    long size=Long.parseLong(socketInput.readLine());
-                   for(long i=0;i<size;i++)
+                   byte[] data=new byte[1024];
+                   DataInputStream dataRead=new DataInputStream(socket.getInputStream());
+                   int read=-1;
+                   socketOutput.println(1);
+                   while(true)
                    {
-                       socketOutput.println(1);
-                       os.write((byte)Integer.parseInt(socketInput.readLine()));
-                       os.flush();
+                       read=dataRead.read(data,0,data.length);
+                       os.write(data,0,read);
+                       size-=read;
+                       if(size<=0)
+                        break;
+                       
                    }
                    socketOutput.println(0);
                    os.close();
